@@ -1,0 +1,20 @@
+[project]
+name = "docs-crowler"
+version = "0.1.0"
+description = "A tool for parsing Git repositories and markdown files."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=1.10",
+    "GitPython>=3.1.0"
+]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.scripts]
+amazme_crowler = "crowler.main:main"
