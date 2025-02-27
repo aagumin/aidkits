@@ -20,12 +20,8 @@ saving the output. This tool is particularly useful for processing documentation
 
 Make sure you are using **Python 3.12 or newer** and have `pip` installed.
 
-1. Clone the repository or download the project files.
-2. Navigate to the project's root directory (next to `pyproject.toml`).
-3. Install the package:
-
    ```bash
-   pip install .
+   pip install amazme_crowler
    ```
 
 Once installed, the command-line utility `amazme_crowler` will be available.

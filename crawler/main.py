@@ -3,7 +3,7 @@ import json
 import shutil
 from pathlib import Path
 
-from crowler.parse import clone_git_repo, collect_markdown_files
+from crawler.parse import clone_git_repo, collect_markdown_files
 
 def main():
     parser = argparse.ArgumentParser(description="Git repository parser with markdown data extraction.")
