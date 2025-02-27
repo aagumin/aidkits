@@ -1,7 +1,7 @@
 import os
 import tempfile
 import pytest
-from crowler.parse import split_by_headers, LibrarySource, CodeChunk
+from crawler.parse import split_by_headers, LibrarySource, CodeChunk
 
 
 @pytest.mark.parametrize(
