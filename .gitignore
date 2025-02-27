@@ -3,3 +3,4 @@
 .idea
 *.json
 __pycache__
+dist
