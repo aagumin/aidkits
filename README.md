@@ -1,6 +1,6 @@
 # Markdown Docs Crawler
 
-`Markdown docs crawler` (command: `amazme_crawler`) is a Python tool designed to parse Git repositories or local directories
+`Markdown docs crawler` (command: `mdcrawler`) is a Python tool designed to parse Git repositories or local directories
 containing Markdown files. It allows extracting content from Markdown files, organizing it into structured JSON, and
 saving the output. This tool is particularly useful for processing documentation repositories.
 
@@ -12,7 +12,7 @@ saving the output. This tool is particularly useful for processing documentation
 - Extract and split Markdown content into chunks based on headers (`#`, `##`, `###`)
 - Save parsed Markdown data in JSON format
 - Modular and extensible design
-- Available as a command-line utility: `amazme_crawler`
+- Available as a command-line utility: `mdcrawler`
 
 ---
 
@@ -21,10 +21,10 @@ saving the output. This tool is particularly useful for processing documentation
 Make sure you are using **Python 3.9 or newer** and have `pip` installed.
 
    ```bash
-   pip install amazme_crawler
+   pip install giga_crawler
    ```
 
-Once installed, the command-line utility `amazme_crawler` will be available.
+Once installed, the command-line utility `giga_crawler` will be available.
 
 ---
 
@@ -46,7 +46,7 @@ extracted from Markdown files.
 1. **Clone a remote repository and parse Markdown files:**
 
 ```bash
-amazme_crawler --repo_url https://github.com/example/repo.git --is_remote
+mdcrawler --repo_url https://github.com/example/repo.git --is_remote
 ```
    or
    
@@ -64,7 +64,7 @@ amazme_crawler --repo_url https://github.com/example/repo.git --is_remote
 2. **Parse a local directory and save output to a custom JSON file:**
 
    ```bash
-   amazme_crawler --repo_url ./local_directory --output_path result.json
+   giga_crawler --repo_url ./local_directory --output_path result.json
    ```
 
    This will:
@@ -122,7 +122,7 @@ If you want to contribute or modify this package, follow these steps:
 3. Run the package locally for testing:
 
    ```bash
-   python -m amazme_crawler.main --repo_url ./local_directory --output_path test_output.json
+   python -m giga_crawler.main --repo_url ./local_directory --output_path test_output.json
    ```
 
 ---

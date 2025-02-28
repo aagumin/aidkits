@@ -1,5 +1,5 @@
 [project]
-name = "amazme_crawler"
+name = "giga_crawler"
 version = "0.1.0"
 description = "A tool for parsing Git repositories and markdown files."
 readme = "README.md"
@@ -26,4 +26,4 @@ rye = { dev-dependencies = [
 packages = ["crawler"]
 
 [project.scripts]
-amazme_crawler = "crawler.main:main"
+mdcrawler = "crawler.main:main"
