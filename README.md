@@ -45,8 +45,15 @@ extracted from Markdown files.
 
 1. **Clone a remote repository and parse Markdown files:**
 
-   ```bash
-   amazme_crowler --repo_url https://github.com/example/repo.git --is_remote
+```bash
+amazme_crowler --repo_url https://github.com/example/repo.git --is_remote
+```
+   or
+   
+```python
+ from crawler import run
+
+ run("repo/path")
    ```
 
    This will:

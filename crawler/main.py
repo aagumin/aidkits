@@ -5,15 +5,22 @@ from pathlib import Path
 
 from crawler.parse import clone_git_repo, collect_markdown_files
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Git repository parser with markdown data extraction.")
-    parser.add_argument(
-        "--repo_url", type=str, required=True,
-        help="URL of the repository to clone or the path to a local directory."
+    parser = argparse.ArgumentParser(
+        description="Git repository parser with markdown data extraction.",
     )
     parser.add_argument(
-        "--output_path", type=str, default="output.json",
-        help="Path to save the JSON output (default: output.json)."
+        "--repo_url",
+        type=str,
+        required=True,
+        help="URL of the repository to clone or the path to a local directory.",
+    )
+    parser.add_argument(
+        "--output_path",
+        type=str,
+        default="output.json",
+        help="Path to save the JSON output (default: output.json).",
     )
     parser.add_argument(
         "--path_prefix",
@@ -24,7 +31,14 @@ def main():
     output_path = args.output_path
     path_prefix = args.path_prefix
 
-    is_remote = True if any(repo_url.startswith(prefix) for prefix in ["https://", "http://", "git@", "ssh://"]) else False
+    is_remote = (
+        True
+        if any(
+            repo_url.startswith(prefix)
+            for prefix in ["https://", "http://", "git@", "ssh://"]
+        )
+        else False
+    )
 
     try:
         if is_remote:
