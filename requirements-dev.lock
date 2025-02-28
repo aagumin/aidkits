@@ -12,6 +12,8 @@
 -e file:.
 annotated-types==0.7.0
     # via pydantic
+codespell==2.4.1
+coverage==7.6.12
 exceptiongroup==1.2.2
     # via pytest
 gitdb==4.0.12

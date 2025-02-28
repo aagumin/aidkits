@@ -17,6 +17,8 @@ build-backend = "hatchling.build"
 rye = { dev-dependencies = [
     "pytest>=8.3.4",
     "ruff>=0.9.8",
+    "coverage>=7.6.12",
+    "codespell>=2.4.1",
 ] }
 
 [tool.hatch.build.targets.wheel]

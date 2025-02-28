@@ -84,16 +84,13 @@ def test_library_source_save_json():
 
 @pytest.fixture
 def markdown_test_repo(tmp_path):
-    """Создает временную структуру файлов, имитирующую клонированный репозиторий
-    """
+
     repo_dir = tmp_path / "repo"
     repo_dir.mkdir()
 
-    # Создадим несколько Markdown-файлов
     (repo_dir / "file1.md").write_text("# Header 1\nContent for file 1")
     (repo_dir / "file2.md").write_text("# Header 2\nContent for file 2")
 
-    # Создадим несколько неспецифичных файлов
     (repo_dir / "file.txt").write_text("This is a text file")
     (repo_dir / "script.py").write_text("print('Hello, World!')")
 
@@ -102,21 +99,16 @@ def markdown_test_repo(tmp_path):
 
 @pytest.fixture
 def mocked_clone_git_repo(markdown_test_repo):
-    """Мок для функции clone_git_repo, чтобы она возвращала путь к фиктивному репозиторию
-    """
     with patch("crawler.parse.clone_git_repo", return_value=str(markdown_test_repo)):
         yield
 
 
 def test_run_happy_path(mocked_clone_git_repo):
-    """Проверка успешного выполнения функции run с реальными данными
-    """
-    # Предполагаем, что run возвращает разобранный контент файлов Markdown
+
     repo_url = "https://github.com/example/test_repo.git"
 
     result = run(repo_url)
 
-    # Проверяем содержимое результата
 
     for i in range(len(result)):
         assert isinstance(result[i], LibrarySource)
@@ -131,29 +123,23 @@ def test_run_happy_path(mocked_clone_git_repo):
                     chunk_amount=1,
                 ),
             ],
-        )  # Ожидаемые заголовки
+        )
         assert (
             result[i].chunks[0].content == f"# Header {i + 1}\nContent for file {i + 1}"
         )
 
 
 def test_run_no_markdown_files_found(mocked_clone_git_repo, tmp_path):
-    """Проверка поведения функции run, если в репозитории нет Markdown-файлов
-    """
-    # Создаем пустой репозиторий без Markdown
     empty_repo = tmp_path / "empty_repo"
     empty_repo.mkdir()
 
     with patch("crawler.parse.clone_git_repo", return_value=str(empty_repo)):
         result = run("https://github.com/example/empty_repo.git")
 
-    # Ожидаем, что результат пуст
     assert result == []
 
 
 def test_run_invalid_repo_url():
-    """Проверка вызова функции run с некорректным URL
-    """
-    # Пытаемся выполнить run с некорректным URL
+
     with pytest.raises(ValueError, match="Invalid repository URL"):
         run("invalid_url")
