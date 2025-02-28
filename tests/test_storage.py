@@ -3,7 +3,9 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-from crawler.storage import RemoteGitRepository
+import pytest
+
+from crawler.storage import LocalFileSystem, RemoteGitRepository
 
 
 def test_remote_git_repository_fetch_with_valid_uri():
@@ -21,7 +23,7 @@ def test_remote_git_repository_fetch_with_invalid_uri():
     with patch("crawler.storage.Repo.clone_from", side_effect=Exception("Invalid URL")):
         remote_repo = RemoteGitRepository(uri=invalid_uri)
         with pytest.raises(
-            RuntimeError, match="Failed to clone repository: Invalid URL"
+            RuntimeError, match="Failed to clone repository: Invalid URL",
         ):
             remote_repo.fetch()
 
@@ -29,19 +31,15 @@ def test_remote_git_repository_fetch_with_invalid_uri():
 def test_remote_git_repository_cleans_up_on_failure():
     faulty_uri = "https://github.com/nonexistent/repo.git"
     with patch(
-        "crawler.storage.Repo.clone_from", side_effect=Exception("Error cloning")
+        "crawler.storage.Repo.clone_from", side_effect=Exception("Error cloning"),
     ):
         remote_repo = RemoteGitRepository(uri=faulty_uri)
         with patch("shutil.rmtree") as mock_rmtree:
             with pytest.raises(
-                RuntimeError, match="Failed to clone repository: Error cloning"
+                RuntimeError, match="Failed to clone repository: Error cloning",
             ):
                 remote_repo.fetch()
             mock_rmtree.assert_called_once()
-
-
-import pytest
-from crawler.storage import LocalFileSystem
 
 
 def test_local_file_system_fetch_with_valid_path():

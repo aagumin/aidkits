@@ -12,7 +12,7 @@ from crawler.storage import LocalFileSystem, RemoteGitRepository
 
 class MarkdownCrawler:
     def __init__(
-        self, repo_url: str, output_path: str = "output.json", path_prefix: str = None
+        self, repo_url: str, output_path: str = "output.json", path_prefix: str = None,
     ):
         self.repo_url = repo_url
         self.output_path = output_path
@@ -31,16 +31,15 @@ class MarkdownCrawler:
         return is_remote
 
     def split_markdown_by_headers(self, markdown_text):
+        """Splits the Markdown document text by headers (the `#` symbol),
+        excluding headers that are inside code blocks (` or `````).
         """
-        Разделяет текст документа Markdown по заголовкам (символ `#`),
-        исключая заголовки, содержащиеся внутри блоков кода (` или `````).
-        """
-        # Регулярные выражения для поиска блоков кода и заголовков
+
         code_block_pattern = re.compile(
-            r"(```.*?```|`.*?`)", re.DOTALL
+            r"(```.*?```|`.*?`)", re.DOTALL,
         )  # Ищет блоки кода (одинарные/тройные)
         header_pattern = re.compile(
-            r"^(#{1,6})\s+(.*)", re.MULTILINE
+            r"^(#{1,6})\s+(.*)", re.MULTILINE,
         )  # Ищет заголовки вне блоков
 
         # Индексы всех блоков кода
@@ -50,38 +49,33 @@ class MarkdownCrawler:
         ]
 
         def is_inside_code_blocks(index):
-            """Проверяет, находится ли индекс внутри блока кода."""
+            """Checks if the index is inside a code block."""
             for start, end in code_blocks:
                 if start <= index < end:
                     return True
             return False
 
-        # Находим все заголовки, которые находятся вне блоков кода
         headers = [
             (
                 match.start(),
                 match.group(1),
                 match.group(2),
-            )  # Начальный индекс, "##", текст заголовка
+            )
             for match in header_pattern.finditer(markdown_text)
             if not is_inside_code_blocks(match.start())
         ]
 
-        # Если не найдено ни одного заголовка, возвращаем оригинальный текст
         if not headers:
             return [markdown_text]
 
-        # Разделяем текст на чанки
         chunks = []
         last_index = 0
 
         for start, header_level, header_text in headers:
-            # Добавляем все, что перед текущим заголовком, как отдельный кусок
             if start > last_index:
                 chunks.append(markdown_text[last_index:start].strip())
             last_index = start
 
-        # Добавляем оставшийся текст после последнего заголовка
         if last_index < len(markdown_text):
             chunks.append(markdown_text[last_index:].strip())
 
@@ -114,7 +108,7 @@ class MarkdownCrawler:
                         for chunk_num, chunk_content in enumerate(chunks)
                     ]
                     library_sources.append(
-                        LibrarySource(title=file, chunks=code_chunks)
+                        LibrarySource(title=file, chunks=code_chunks),
                     )
 
         return library_sources
@@ -124,7 +118,7 @@ class MarkdownCrawler:
 
         directory_path = location(self.repo_url).fetch()
         try:
-            if self.path_prefix:  # Выполнять только если path_prefix не равен None
+            if self.path_prefix:
                 directory_path = Path(directory_path) / self.path_prefix
 
             library_sources = self.collect_markdown_files(directory_path)

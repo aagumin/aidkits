@@ -3,7 +3,6 @@ import tempfile
 
 import pytest
 
-
 from crawler.parse import MarkdownCrawler
 
 
@@ -66,7 +65,6 @@ More content.
 Simple text.
 
 """
-        # Write the sample contents to files
         with (
             open(file1_path, "w", encoding="utf-8") as f1,
             open(file2_path, "w", encoding="utf-8") as f2,
@@ -111,7 +109,6 @@ Simple text.
 
 
 def test_collect_markdown_files_empty_directory():
-    # Create an empty temporary directory
     with tempfile.TemporaryDirectory() as temp_dir:
         class_instance = MarkdownCrawler(temp_dir)  # Replace with the actual class name
         sources = class_instance.collect_markdown_files(temp_dir)

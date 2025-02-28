@@ -2,11 +2,11 @@ import os
 import tempfile
 
 import pytest
+
 from crawler.models import CodeChunk, LibrarySource
 
 
 def test_code_chunk_initialization():
-    # Test basic initialization of the class
     chunk = CodeChunk(
         title="Section 1",
         content="This is the content of the chunk.",
@@ -22,7 +22,6 @@ def test_code_chunk_initialization():
 
 
 def test_code_chunk_markdown_property():
-    # Test the markdown output for proper formatting
     chunk = CodeChunk(
         title="Section 1",
         content="This is the content of the chunk.",
@@ -35,16 +34,14 @@ def test_code_chunk_markdown_property():
 
 
 def test_code_chunk_empty_content():
-    # Test the behavior when content is empty
     chunk = CodeChunk(
-        title="Empty Content", content="", length=0, chunk_num=1, chunk_amount=1
+        title="Empty Content", content="", length=0, chunk_num=1, chunk_amount=1,
     )
     expected_markdown = "Empty Content\nChunk 1/1\n\n"
     assert chunk.markdown == expected_markdown
 
 
 def test_code_chunk_multiple_chunks():
-    # Test correctness for multiple chunks (title and numbers should match)
     chunk = CodeChunk(
         title="Part 1",
         content="This is part of the content.",
@@ -57,7 +54,6 @@ def test_code_chunk_multiple_chunks():
 
 
 def test_code_chunk_boundary_conditions():
-    # Test edge case scenarios, e.g., chunk_num = chunk_amount
     chunk = CodeChunk(
         title="Final Section",
         content="This is the final chunk.",
@@ -85,9 +81,8 @@ def test_code_chunk_boundary_conditions():
     ],
 )
 def test_code_chunk_markdown_parametrize(
-    title, content, length, chunk_num, chunk_amount, expected_markdown
+    title, content, length, chunk_num, chunk_amount, expected_markdown,
 ):
-    # Use pytest's parametrize feature to test various cases
     chunk = CodeChunk(
         title=title,
         content=content,
@@ -150,7 +145,7 @@ def test_librarysource_from_json():
     }
     """
     with tempfile.NamedTemporaryFile(
-        delete=False, mode="w", encoding="utf-8"
+        delete=False, mode="w", encoding="utf-8",
     ) as temp_file:
         temp_file.write(data)
         path = temp_file.name
