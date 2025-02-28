@@ -51,9 +51,9 @@ amazme_crowler --repo_url https://github.com/example/repo.git --is_remote
    or
    
 ```python
- from crawler import run
+ from crawler import MarkdownCrawler
 
- run("repo/path")
+ MarkdownCrawler("repo/path").work()
    ```
 
    This will:

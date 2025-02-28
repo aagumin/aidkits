@@ -2,133 +2,148 @@ import json
 import os
 import re
 import shutil
-import tempfile
+from functools import cached_property
 from pathlib import Path
-from typing import List, Optional, Union
-
-from git import Repo
+from typing import List, Optional
 
 from crawler.models import CodeChunk, LibrarySource
+from crawler.storage import LocalFileSystem, RemoteGitRepository
 
 
-def clone_git_repo(repo_url: str) -> str:
-    """Clones a Git repository from the given URL into a temporary directory.
+class MarkdownCrawler:
+    def __init__(
+        self, repo_url: str, output_path: str = "output.json", path_prefix: str = None
+    ):
+        self.repo_url = repo_url
+        self.output_path = output_path
+        self.path_prefix = path_prefix
 
-    :param repo_url: URL of the repository (GitHub, Bitbucket, or other remote repositories)
-    :return: The path to the temporary directory where the repository was cloned
-    """
-    temp_dir = tempfile.mkdtemp()
-    try:
-        print(f"Cloning repository {repo_url} into {temp_dir}...")
-        Repo.clone_from(repo_url, temp_dir)
-        return temp_dir
-    except Exception as e:
-        shutil.rmtree(temp_dir)
-        raise RuntimeError(f"Failed to clone repository: {e}")
-
-
-def split_by_headers(content: str) -> List[str]:
-    """Splits the text into chunks by headers starting with symbols #, ##, or ###.
-
-    Headers add their chunk number.
-    If there is no newline after the header, do not extract its content.
-
-    :param content: The string content of a markdown file
-    :return: A list of chunks, each starting with a header
-    """
-    header_pattern = re.compile(r"^(#+ .+)", re.MULTILINE)
-    matches = list(header_pattern.finditer(content))
-    if not matches:
-        return [content.strip()]
-
-    chunks = []
-    for i, match in enumerate(matches):
-        start_idx = match.start()
-        end_idx = matches[i + 1].start() if i + 1 < len(matches) else len(content)
-        header = match.group(1)
-        chunk_content = content[start_idx:end_idx].strip()
-        if "\n" not in chunk_content[len(header) :]:
-            continue
-
-        header_with_chunk = f"{header}"
-        chunk = f"{header_with_chunk}\n{chunk_content[len(header) :].strip()}"
-        chunks.append(chunk)
-
-    return chunks
-
-
-def collect_markdown_files(directory: str) -> List[LibrarySource]:
-    """Iterates over the given directory and its subdirectories, collects markdown files,
-    and reads them into the LibrarySource structure, splitting by headers.
-
-    :param directory: Path to the root directory
-    :return: A list of LibrarySource objects
-    """
-    library_sources = []
-    for root, _, files in os.walk(directory):
-        for file in files:
-            if file.endswith(".md"):
-                file_path = os.path.join(root, file)
-                with open(file_path, encoding="utf-8") as f:
-                    content = f.read()
-                chunks = split_by_headers(content)
-                chunk_amount = len(chunks)
-                code_chunks = [
-                    CodeChunk(
-                        title=f"{file}",
-                        content=chunk_content,
-                        length=len(chunk_content),
-                        chunk_num=chunk_num + 1,
-                        chunk_amount=chunk_amount,
-                    )
-                    for chunk_num, chunk_content in enumerate(chunks)
-                ]
-                library_sources.append(LibrarySource(title=file, chunks=code_chunks))
-
-    return library_sources
-
-
-def run(
-    repo_url: Union[Path, str], output_path="output.json", path_prefix=None,
-) -> Optional[list[LibrarySource]]:
-    is_remote = (
-        True
-        if any(
-            repo_url.startswith(prefix)
-            for prefix in ["https://", "http://", "git@", "ssh://"]
+    @cached_property
+    def _is_remote(self) -> bool:
+        is_remote = (
+            True
+            if any(
+                self.repo_url.startswith(prefix)
+                for prefix in ["https://", "http://", "git@", "ssh://"]
+            )
+            else False
         )
-        else False
-    )
+        return is_remote
 
-    if not is_remote and not Path(repo_url).exists():
-        raise ValueError("Invalid repository URL")
+    def split_markdown_by_headers(self, markdown_text):
+        """
+        Разделяет текст документа Markdown по заголовкам (символ `#`),
+        исключая заголовки, содержащиеся внутри блоков кода (` или `````).
+        """
+        # Регулярные выражения для поиска блоков кода и заголовков
+        code_block_pattern = re.compile(
+            r"(```.*?```|`.*?`)", re.DOTALL
+        )  # Ищет блоки кода (одинарные/тройные)
+        header_pattern = re.compile(
+            r"^(#{1,6})\s+(.*)", re.MULTILINE
+        )  # Ищет заголовки вне блоков
 
-    try:
-        if is_remote:
-            directory_path = clone_git_repo(repo_url)
-        else:
-            directory_path = repo_url
+        # Индексы всех блоков кода
+        code_blocks = [
+            (match.start(), match.end())
+            for match in code_block_pattern.finditer(markdown_text)
+        ]
 
-        if path_prefix:  # Выполнять только если path_prefix не равен None
-            directory_path = Path(directory_path) / path_prefix
+        def is_inside_code_blocks(index):
+            """Проверяет, находится ли индекс внутри блока кода."""
+            for start, end in code_blocks:
+                if start <= index < end:
+                    return True
+            return False
 
-        library_sources = collect_markdown_files(directory_path)
-        if library_sources:
-            with open(output_path, "w", encoding="utf-8") as f:
-                json.dump(
-                    [lib_source.model_dump() for lib_source in library_sources],
-                    f,
-                    ensure_ascii=False,
-                    indent=4,
-                )
-            print(f"JSON saved: {output_path}")
+        # Находим все заголовки, которые находятся вне блоков кода
+        headers = [
+            (
+                match.start(),
+                match.group(1),
+                match.group(2),
+            )  # Начальный индекс, "##", текст заголовка
+            for match in header_pattern.finditer(markdown_text)
+            if not is_inside_code_blocks(match.start())
+        ]
 
-        if library_sources and library_sources[0].chunks:
-            print(library_sources[0].chunks[0].markdown)
+        # Если не найдено ни одного заголовка, возвращаем оригинальный текст
+        if not headers:
+            return [markdown_text]
 
-    finally:
-        if is_remote:
-            shutil.rmtree(directory_path)
-            print(f"Temporary directory {directory_path} removed.")
+        # Разделяем текст на чанки
+        chunks = []
+        last_index = 0
 
-    return library_sources
+        for start, header_level, header_text in headers:
+            # Добавляем все, что перед текущим заголовком, как отдельный кусок
+            if start > last_index:
+                chunks.append(markdown_text[last_index:start].strip())
+            last_index = start
+
+        # Добавляем оставшийся текст после последнего заголовка
+        if last_index < len(markdown_text):
+            chunks.append(markdown_text[last_index:].strip())
+
+        return chunks
+
+    def collect_markdown_files(self, directory: str) -> List[LibrarySource]:
+        """Iterates over the given directory and its subdirectories, collects markdown files,
+        and reads them into the LibrarySource structure, splitting by headers.
+
+        :param directory: Path to the root directory
+        :return: A list of LibrarySource objects
+        """
+        library_sources = []
+        for root, _, files in os.walk(directory):
+            for file in files:
+                if file.endswith(".md"):
+                    file_path = os.path.join(root, file)
+                    with open(file_path, encoding="utf-8") as f:
+                        content = f.read()
+                    chunks = self.split_markdown_by_headers(content)
+                    chunk_amount = len(chunks)
+                    code_chunks = [
+                        CodeChunk(
+                            title=f"{file}",
+                            content=chunk_content,
+                            length=len(chunk_content),
+                            chunk_num=chunk_num + 1,
+                            chunk_amount=chunk_amount,
+                        )
+                        for chunk_num, chunk_content in enumerate(chunks)
+                    ]
+                    library_sources.append(
+                        LibrarySource(title=file, chunks=code_chunks)
+                    )
+
+        return library_sources
+
+    def work(self) -> Optional[list[LibrarySource]]:
+        location = RemoteGitRepository if self._is_remote else LocalFileSystem
+
+        directory_path = location(self.repo_url).fetch()
+        try:
+            if self.path_prefix:  # Выполнять только если path_prefix не равен None
+                directory_path = Path(directory_path) / self.path_prefix
+
+            library_sources = self.collect_markdown_files(directory_path)
+            if library_sources:
+                with open(self.output_path, "w", encoding="utf-8") as f:
+                    json.dump(
+                        [lib_source.model_dump() for lib_source in library_sources],
+                        f,
+                        ensure_ascii=False,
+                        indent=4,
+                    )
+                print(f"JSON saved: {self.output_path}")
+
+            if library_sources and library_sources[0].chunks:
+                print(library_sources[0].chunks[0].markdown)
+
+        finally:
+            if self._is_remote:
+                shutil.rmtree(directory_path)
+                print(f"Temporary directory {directory_path} removed.")
+
+        return library_sources
