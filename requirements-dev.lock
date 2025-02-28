@@ -14,6 +14,7 @@ annotated-types==0.7.0
     # via pydantic
 codespell==2.4.1
 coverage==7.6.12
+    # via pytest-cov
 exceptiongroup==1.2.2
     # via pytest
 gitdb==4.0.12
@@ -31,10 +32,13 @@ pydantic==2.10.6
 pydantic-core==2.27.2
     # via pydantic
 pytest==8.3.4
+    # via pytest-cov
+pytest-cov==6.0.0
 ruff==0.9.8
 smmap==5.0.2
     # via gitdb
 tomli==2.2.1
+    # via coverage
     # via pytest
 typing-extensions==4.12.2
     # via pydantic

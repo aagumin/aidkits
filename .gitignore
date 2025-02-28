@@ -5,3 +5,6 @@
 __pycache__
 dist
 .coverage
+coverage.xml
+report.xml
+htmlcov
