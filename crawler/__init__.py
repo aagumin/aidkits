@@ -1,3 +1,3 @@
 from .parse import MarkdownCrawler
 
-__all__ = ['MarkdownCrawler']
+__all__ = ["MarkdownCrawler"]
