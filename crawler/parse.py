@@ -12,7 +12,10 @@ from crawler.storage import LocalFileSystem, RemoteGitRepository
 
 class MarkdownCrawler:
     def __init__(
-        self, repo_url: str, output_path: str = "output.json", path_prefix: str = None,
+        self,
+        repo_url: str,
+        output_path: str = "output.json",
+        path_prefix: str = None,
     ):
         self.repo_url = repo_url
         self.output_path = output_path
@@ -34,12 +37,13 @@ class MarkdownCrawler:
         """Splits the Markdown document text by headers (the `#` symbol),
         excluding headers that are inside code blocks (` or `````).
         """
-
         code_block_pattern = re.compile(
-            r"(```.*?```|`.*?`)", re.DOTALL,
+            r"(```.*?```|`.*?`)",
+            re.DOTALL,
         )  # Ищет блоки кода (одинарные/тройные)
         header_pattern = re.compile(
-            r"^(#{1,6})\s+(.*)", re.MULTILINE,
+            r"^(#{1,6})\s+(.*)",
+            re.MULTILINE,
         )  # Ищет заголовки вне блоков
 
         # Индексы всех блоков кода

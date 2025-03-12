@@ -35,7 +35,11 @@ def test_code_chunk_markdown_property():
 
 def test_code_chunk_empty_content():
     chunk = CodeChunk(
-        title="Empty Content", content="", length=0, chunk_num=1, chunk_amount=1,
+        title="Empty Content",
+        content="",
+        length=0,
+        chunk_num=1,
+        chunk_amount=1,
     )
     expected_markdown = "Empty Content\nChunk 1/1\n\n"
     assert chunk.markdown == expected_markdown
@@ -81,7 +85,12 @@ def test_code_chunk_boundary_conditions():
     ],
 )
 def test_code_chunk_markdown_parametrize(
-    title, content, length, chunk_num, chunk_amount, expected_markdown,
+    title,
+    content,
+    length,
+    chunk_num,
+    chunk_amount,
+    expected_markdown,
 ):
     chunk = CodeChunk(
         title=title,
@@ -145,7 +154,9 @@ def test_librarysource_from_json():
     }
     """
     with tempfile.NamedTemporaryFile(
-        delete=False, mode="w", encoding="utf-8",
+        delete=False,
+        mode="w",
+        encoding="utf-8",
     ) as temp_file:
         temp_file.write(data)
         path = temp_file.name

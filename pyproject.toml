@@ -20,6 +20,7 @@ rye = { dev-dependencies = [
     "coverage>=7.6.12",
     "codespell>=2.4.1",
     "pytest-cov>=6.0.0",
+    "pydantic-settings>=2.8.1",
 ] }
 
 [tool.hatch.build.targets.wheel]
