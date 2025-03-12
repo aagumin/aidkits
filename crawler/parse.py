@@ -34,7 +34,6 @@ class MarkdownCrawler:
         """Splits the Markdown document text by headers (the `#` symbol),
         excluding headers that are inside code blocks (` or `````).
         """
-
         code_block_pattern = re.compile(
             r"(```.*?```|`.*?`)", re.DOTALL,
         )  # Ищет блоки кода (одинарные/тройные)

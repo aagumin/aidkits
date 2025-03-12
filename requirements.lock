@@ -15,9 +15,9 @@ annotated-types==0.7.0
 gitdb==4.0.12
     # via gitpython
 gitpython==3.1.44
-    # via amazme-crawler
+    # via giga-crawler
 pydantic==2.10.6
-    # via amazme-crawler
+    # via giga-crawler
 pydantic-core==2.27.2
     # via pydantic
 smmap==5.0.2
