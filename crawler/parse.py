@@ -1,13 +1,11 @@
 import json
+import logging
 import os
 import re
-import shutil
-from functools import cached_property
 from pathlib import Path
 from typing import List, Optional
 
 from crawler.models import CodeChunk, LibrarySource
-from crawler.storage import LocalFileSystem, RemoteGitRepository
 
 
 class MarkdownCrawler:
@@ -21,29 +19,22 @@ class MarkdownCrawler:
         self.output_path = output_path
         self.path_prefix = path_prefix
 
-    @cached_property
-    def _is_remote(self) -> bool:
-        is_remote = (
-            True
-            if any(
-                self.repo_url.startswith(prefix)
-                for prefix in ["https://", "http://", "git@", "ssh://"]
-            )
-            else False
-        )
-        return is_remote
+    def _is_inside_code_blocks(self, index, code_blocks) -> bool:
+        """Checks if the index is inside a code block."""
+        for start, end in code_blocks:
+            if start <= index < end:
+                return True
+        return False
 
     def split_markdown_by_headers(self, markdown_text):
         """Splits the Markdown document text by headers (the `#` symbol),
         excluding headers that are inside code blocks (` or `````).
         """
         code_block_pattern = re.compile(
-            r"(```.*?```|`.*?`)",
-            re.DOTALL,
+            r"(```.*?```|`.*?`)", re.DOTALL
         )  # Ищет блоки кода (одинарные/тройные)
         header_pattern = re.compile(
-            r"^(#{1,6})\s+(.*)",
-            re.MULTILINE,
+            r"^(#{1,6})\s+(.*)", re.MULTILINE
         )  # Ищет заголовки вне блоков
 
         # Индексы всех блоков кода
@@ -52,13 +43,6 @@ class MarkdownCrawler:
             for match in code_block_pattern.finditer(markdown_text)
         ]
 
-        def is_inside_code_blocks(index):
-            """Checks if the index is inside a code block."""
-            for start, end in code_blocks:
-                if start <= index < end:
-                    return True
-            return False
-
         headers = [
             (
                 match.start(),
@@ -66,7 +50,7 @@ class MarkdownCrawler:
                 match.group(2),
             )
             for match in header_pattern.finditer(markdown_text)
-            if not is_inside_code_blocks(match.start())
+            if not self._is_inside_code_blocks(match.start(), code_blocks)
         ]
 
         if not headers:
@@ -118,30 +102,22 @@ class MarkdownCrawler:
         return library_sources
 
     def work(self) -> Optional[list[LibrarySource]]:
-        location = RemoteGitRepository if self._is_remote else LocalFileSystem
+        directory_path = Path(self.repo_url).joinpath(Path(self.path_prefix))
+        logging.info("Collecting markdown files...{}".format(directory_path))
 
-        directory_path = location(self.repo_url).fetch()
-        try:
-            if self.path_prefix:
-                directory_path = Path(directory_path) / self.path_prefix
-
-            library_sources = self.collect_markdown_files(directory_path)
-            if library_sources:
-                with open(self.output_path, "w", encoding="utf-8") as f:
-                    json.dump(
-                        [lib_source.model_dump() for lib_source in library_sources],
-                        f,
-                        ensure_ascii=False,
-                        indent=4,
-                    )
-                print(f"JSON saved: {self.output_path}")
-
-            if library_sources and library_sources[0].chunks:
-                print(library_sources[0].chunks[0].markdown)
-
-        finally:
-            if self._is_remote:
-                shutil.rmtree(directory_path)
-                print(f"Temporary directory {directory_path} removed.")
+        library_sources = self.collect_markdown_files(directory_path)
+        if library_sources:
+            with open(self.output_path, "w", encoding="utf-8") as f:
+                json.dump(
+                    [lib_source.model_dump() for lib_source in library_sources],
+                    f,
+                    ensure_ascii=False,
+                    indent=4,
+                )
+            logging.info(f"json saved: {self.output_path}")
+        else:
+            logging.error(f"No markdown files found in the directory: {directory_path}")
+        if library_sources and library_sources[0].chunks:
+            print(library_sources[0].chunks[0].markdown)
 
         return library_sources

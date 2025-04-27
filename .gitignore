@@ -8,3 +8,4 @@ dist
 coverage.xml
 report.xml
 htmlcov
+*.json
