@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+from git import GitCommandError
 
 from crawler.storage import LocalFileSystem, RemoteGitRepository
 
@@ -18,15 +19,13 @@ def test_remote_git_repository_fetch_with_valid_uri():
         mock_clone.assert_called_once_with(valid_uri, temp_dir)
 
 
-def test_remote_git_repository_fetch_with_invalid_uri():
+def test_remote_git_repository_fetch_with_invalid_uri(capsys):
     invalid_uri = "invalid_git_url"
-    with patch("crawler.storage.Repo.clone_from", side_effect=Exception("Invalid URL")):
-        remote_repo = RemoteGitRepository(uri=invalid_uri)
-        with pytest.raises(
-            RuntimeError,
-            match="Failed to clone repository: Invalid URL",
-        ):
-            remote_repo.fetch()
+    remote_repo = RemoteGitRepository(uri=invalid_uri)
+    with pytest.raises(GitCommandError):
+        remote_repo.fetch()
+    # captured = capsys.readouterr()
+    # assert captured.err == "fatal: repository 'invalid_git_url' does not exist"
 
 
 def test_remote_git_repository_cleans_up_on_failure():
@@ -38,8 +37,8 @@ def test_remote_git_repository_cleans_up_on_failure():
         remote_repo = RemoteGitRepository(uri=faulty_uri)
         with patch("shutil.rmtree") as mock_rmtree:
             with pytest.raises(
-                RuntimeError,
-                match="Failed to clone repository: Error cloning",
+                Exception,
+                match="Error cloning",
             ):
                 remote_repo.fetch()
             mock_rmtree.assert_called_once()

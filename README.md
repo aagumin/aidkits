@@ -64,7 +64,7 @@ mdcrawler --repo_url https://github.com/example/repo.git --is_remote
 2. **Parse a local directory and save output to a custom JSON file:**
 
    ```bash
-   giga_crawler --repo_url ./local_directory --output_path result.json
+   mdcrawler --url ./local_directory --output_path result.json
    ```
 
    This will:

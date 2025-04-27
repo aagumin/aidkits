@@ -1,6 +1,8 @@
 import argparse
+from pathlib import Path
 
 from crawler.parse import MarkdownCrawler
+from crawler.storage import MdLocation
 
 
 def main():
@@ -8,10 +10,10 @@ def main():
         description="Git repository parser with markdown data extraction.",
     )
     parser.add_argument(
-        "--repo_url",
+        "--uri",
         type=str,
         required=True,
-        help="URL of the repository to clone or the path to a local directory.",
+        help="URL comma-separated URLs of the repository to clone or the path to a local directory. Add a path prefix to the local directory.",
     )
     parser.add_argument(
         "--output_path",
@@ -19,15 +21,35 @@ def main():
         default="output.json",
         help="Path to save the JSON output (default: output.json).",
     )
+
     parser.add_argument(
-        "--path_prefix",
-        help="Path with docs for remote repo (optional).",
+        "--directory",
+        type=str,
+        default="",
+        help="Path to save the JSON output (default: output.json).",
+    )
+
+    parser.add_argument(
+        "--multy_process",
+        type=bool,
+        default=False,
+        help="Spawn multiple processes to speed up the process.",
     )
 
     args = parser.parse_args()
-    repo_url = args.repo_url
+    repo_url = list(map(str.strip, args.uri.split(",")))
+    directory = list(map(str.strip, args.directory.split(",")))
     output_path = args.output_path
-    path_prefix = args.path_prefix
 
-    crawler = MarkdownCrawler(repo_url, output_path, path_prefix)
-    crawler.work()
+    for repo, folder in zip(repo_url, directory):
+        repo_with_md = MdLocation(repo).define()
+        local_repo = repo_with_md.fetch()
+
+        translation_table = dict.fromkeys(map(ord, "@:/."), "_")
+        crawler = MarkdownCrawler(
+            local_repo,
+            f"{Path(repo.translate(translation_table)).as_posix()}" + output_path,
+            folder,
+        )
+        print("going to work")
+        crawler.work()

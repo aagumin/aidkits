@@ -1,6 +1,7 @@
 import shutil
 import tempfile
 import typing
+from functools import cached_property
 from pathlib import Path
 
 from git import Repo
@@ -10,7 +11,7 @@ class Location(typing.Protocol):
     def __init__(self, uri: str):
         self.uri = uri
 
-    def fetch(self):
+    def fetch(self) -> str:
         raise NotImplementedError
 
 
@@ -48,4 +49,43 @@ class RemoteGitRepository:
             return temp_dir
         except Exception as e:
             shutil.rmtree(temp_dir)
-            raise RuntimeError(f"Failed to clone repository: {e}")
+            raise e
+
+
+class S3FileSystem:
+    def __init__(self, uri: str):
+        self.uri = uri
+
+    def fetch(self) -> str:
+        return ""
+
+
+class MdLocation:
+    def __init__(self, uri: str):
+        self.repo_url = uri
+
+        self.tmp_dir = None
+
+    @cached_property
+    def _is_remote(self) -> bool:
+        is_remote = (
+            True
+            if any(
+                self.repo_url.startswith(prefix)
+                for prefix in ["https://", "http://", "git@", "ssh://"]
+            )
+            else False
+        )
+        return is_remote
+
+    @cached_property
+    def _is_s3(self) -> bool:
+        return self.repo_url.startswith("s3://")
+
+    def define(self) -> type[Location]:
+        if self._is_remote:
+            return RemoteGitRepository(self.repo_url)
+        elif self._is_s3:
+            return S3FileSystem(self.repo_url)
+        else:
+            return LocalFileSystem(self.repo_url)
