@@ -37,39 +37,12 @@ extracted from Markdown files.
 
 ### Command-line Arguments
 
-| Argument                | Type    | Description                                                                                    |
-|-------------------------|---------|------------------------------------------------------------------------------------------------|
-| `--uri`                 | String  | URL of a remote Git repository to be cloned, or path to a local directory with Markdown files. |
-| `--output_path`         | String  | Path to save the output JSON file. (Default: `output.json`)                                    |
-| `--directory`           | String  | Optional. Path with docs source if used remote repo with clone.                                |
-| `--multy_process`       | Boolean | Spawn multiple processes to speed up the process. (Default: `False`)                           |
-
-#### OpenSearch Arguments
-
-| Argument                | Type    | Description                                                                |
-|-------------------------|---------|----------------------------------------------------------------------------|
-| `--use_opensearch`      | Flag    | Use OpenSearch for indexing and retrieval.                                 |
-| `--opensearch_host`     | String  | OpenSearch host. (Default: `localhost`)                                    |
-| `--opensearch_port`     | Integer | OpenSearch port. (Default: `9200`)                                         |
-| `--opensearch_index`    | String  | OpenSearch index name. (Default: `chunks`)                                 |
-| `--opensearch_username` | String  | OpenSearch username. (Default: `admin`)                                    |
-| `--opensearch_password` | String  | OpenSearch password. (Default: `admin`)                                    |
-| `--opensearch_use_ssl`  | Flag    | Use SSL for OpenSearch connection.                                         |
-| `--list_chunks`         | Flag    | List chunks from OpenSearch instead of indexing.                           |
-| `--query`               | String  | Query string for searching chunks (used with `--list_chunks`).             |
-| `--source_title`        | String  | Filter chunks by source title (used with `--list_chunks`).                 |
-| `--size`                | Integer | Number of chunks to return (used with `--list_chunks`, default: `100`).    |
-| `--from_`               | Integer | Starting offset for pagination (used with `--list_chunks`, default: `0`).  |
-
-#### JSON Splitter Arguments
-
-| Argument                | Type    | Description                                                                |
-|-------------------------|---------|----------------------------------------------------------------------------|
-| `--split_json`          | Flag    | Split a JSON file into multiple files based on a grouping field.           |
-| `--json_input`          | String  | Path to the input JSON file to split (used with `--split_json`).           |
-| `--json_output_dir`     | String  | Directory where the split JSON files will be saved (default: `output_by_title`). |
-| `--json_group_by`       | String  | Field to group the data by (default: `title`).                             |
-| `--json_encoding`       | String  | Encoding of the input JSON file (default: `utf-8`).                        |
+| Argument          | Type    | Description                                                                                    |
+|-------------------|---------|------------------------------------------------------------------------------------------------|
+| `--uri`           | String  | URL of a remote Git repository to be cloned, or path to a local directory with Markdown files. |
+| `--output_path`   | String  | Path to save the output JSON file. (Default: `output.json`)                                    |
+| `--directory`     | String  | Optional. Path with docs source if used remote repo with clone.                                |
+| `--multy_process` | Boolean | Spawn multiple processes to speed up the process. (Default: `False`)                           |
 
 ### Examples
 
@@ -78,7 +51,8 @@ extracted from Markdown files.
 ```bash
 mdcrawler --uri https://github.com/example/repo.git
 ```
-   or
+
+or
 
 ```python
 from crawler import MarkdownCrawler
@@ -86,10 +60,10 @@ from crawler import MarkdownCrawler
 MarkdownCrawler("repo/path").work()
 ```
 
-   This will:
-    - Clone the repository into a temporary directory
-    - Parse all Markdown files in the repository
-    - Save the JSON output to `output.json`
+This will:
+- Clone the repository into a temporary directory
+- Parse all Markdown files in the repository
+- Save the JSON output to `output.json`
 
 2. **Parse a local directory and save output to a custom JSON file:**
 
@@ -97,68 +71,10 @@ MarkdownCrawler("repo/path").work()
 mdcrawler --uri ./local_directory --output_path result.json
 ```
 
-   This will:
-    - Use the specified local directory `./local_directory`
-    - Parse all Markdown files in the directory
-    - Save the JSON output to `result.json`
-
-3. **Index chunks to OpenSearch:**
-
-```bash
-mdcrawler --uri ./local_directory --use_opensearch --opensearch_host localhost --opensearch_port 9200
-```
-
-   This will:
-    - Parse all Markdown files in the directory
-    - Save the JSON output to `output.json`
-    - Index all chunks to OpenSearch
-
-4. **Retrieve chunks from OpenSearch:**
-
-```bash
-mdcrawler --uri ./local_directory --list_chunks
-```
-
-   This will:
-    - Connect to OpenSearch
-    - Retrieve all chunks from the index
-    - Display them in the console
-
-5. **Search for specific chunks in OpenSearch:**
-
-```bash
-mdcrawler --uri ./local_directory --list_chunks --query "search term" --source_title "example.md"
-```
-
-   This will:
-    - Connect to OpenSearch
-    - Search for chunks containing "search term" in the content
-    - Filter by source title "example.md"
-    - Display the matching chunks in the console
-
-6. **Split a JSON file into multiple files using mdcrawler:**
-
-```bash
-mdcrawler --uri ./local_directory --split_json --json_input large_file.json --json_output_dir output_directory --json_group_by title
-```
-
-   This will:
-    - Read the large_file.json file
-    - Group the data by the "title" field
-    - Create a separate JSON file for each group in the output_directory
-    - Display information about the created files
-
-7. **Split a JSON file using the jsonsplitter command:**
-
-```bash
-jsonsplitter large_file.json --output-dir output_directory --group-by title
-```
-
-   This will:
-    - Read the large_file.json file
-    - Group the data by the "title" field
-    - Create a separate JSON file for each group in the output_directory
-    - Display information about the created files
+This will:
+- Use the specified local directory `./local_directory`
+- Parse all Markdown files in the directory
+- Save the JSON output to `result.json`
 
 ### JSON Output Format
 
@@ -243,7 +159,8 @@ for result in results:
 
 ### DocumentationTool
 
-The `DocumentationTool` class provides a high-level interface for answering questions using documentation stored in OpenSearch. It uses the `OpenSearchRetriever` to find relevant documentation and a language model to generate answers.
+The `DocumentationTool` class provides a high-level interface for answering questions using documentation stored in
+OpenSearch. It uses the `OpenSearchRetriever` to find relevant documentation and a language model to generate answers.
 
 #### Example Usage
 
@@ -273,7 +190,8 @@ print(answer)
 
 ### JsonSplitter
 
-The `JsonSplitter` class provides functionality for splitting a large JSON file into multiple smaller files based on a grouping field. It can be used to organize JSON data by a common field, making it easier to work with large datasets.
+The `JsonSplitter` class provides functionality for splitting a large JSON file into multiple smaller files based on a
+grouping field. It can be used to organize JSON data by a common field, making it easier to work with large datasets.
 
 #### Example Usage
 
