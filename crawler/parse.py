@@ -3,7 +3,7 @@ import logging
 import os
 import re
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from crawler.models import CodeChunk, LibrarySource
 
@@ -107,6 +107,7 @@ class MarkdownCrawler:
 
         library_sources = self.collect_markdown_files(directory_path)
         if library_sources:
+            # Save to JSON file
             with open(self.output_path, "w", encoding="utf-8") as f:
                 json.dump(
                     [lib_source.model_dump() for lib_source in library_sources],
@@ -117,6 +118,7 @@ class MarkdownCrawler:
             logging.info(f"json saved: {self.output_path}")
         else:
             logging.error(f"No markdown files found in the directory: {directory_path}")
+
         if library_sources and library_sources[0].chunks:
             print(library_sources[0].chunks[0].markdown)
 
