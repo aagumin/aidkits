@@ -3,7 +3,7 @@ import tempfile
 
 import pytest
 
-from crawler.models import CodeChunk, LibrarySource
+from aidkit.models import CodeChunk, LibrarySource
 
 
 def test_code_chunk_initialization():

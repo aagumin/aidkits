@@ -1,8 +1,6 @@
-# Markdown Docs Crawler
+# AI (Documentation) Kit
 
-`Markdown docs crawler` (command: `mdcrawler`) is a Python tool designed to parse Git repositories or local directories
-containing Markdown files. It allows extracting content from Markdown files, organizing it into structured JSON, and
-saving the output. This tool is particularly useful for processing documentation repositories.
+`AIDkit` is a Python tools collection designed to help create AI documentation assistants. It includes utilities for parsing Git repositories or local directories containing Markdown files, extracting content, organizing it into structured JSON, and saving the output. These tools are particularly useful for processing documentation repositories for AI-powered assistance. `aidkit`
 
 ---
 
@@ -23,7 +21,7 @@ saving the output. This tool is particularly useful for processing documentation
 Make sure you are using **Python 3.9 or newer** and have `pip` installed.
 
    ```bash
-   pip install giga_crawler
+   pip install aidkit
    ```
 
 Once installed, the command-line utility `giga_crawler` will be available.
@@ -49,13 +47,13 @@ extracted from Markdown files.
 1. **Clone a remote repository and parse Markdown files:**
 
 ```bash
-mdcrawler --uri https://github.com/example/repo.git
+aidkit parse --uri https://github.com/example/repo.git
 ```
 
 or
 
 ```python
-from crawler import MarkdownCrawler
+from aidkit import MarkdownCrawler
 
 MarkdownCrawler("repo/path").work()
 ```
@@ -68,7 +66,7 @@ This will:
 2. **Parse a local directory and save output to a custom JSON file:**
 
 ```bash
-mdcrawler --uri ./local_directory --output_path result.json
+aidkit parse --uri ./local_directory --output_path result.json
 ```
 
 This will:
@@ -121,15 +119,15 @@ The `OpenSearchRetriever` class provides advanced vector search capabilities usi
 ```python
 from opensearchpy import OpenSearch
 from sentence_transformers import SentenceTransformer
-from crawler.opensearch_retriever import OpenSearchRetriever
-from crawler.models import LibrarySource
+from aidkit.storage.opensearch_retriever import OpenSearchRetriever
+from aidkit.models import LibrarySource
 
 # Initialize the OpenSearch client
 client = OpenSearch(
-    hosts=[{"host": "localhost", "port": 9200}],
-    http_auth=("admin", "admin"),
-    use_ssl=False,
-    verify_certs=False,
+   hosts=[{"host": "localhost", "port": 9200}],
+   http_auth=("admin", "admin"),
+   use_ssl=False,
+   verify_certs=False,
 )
 
 # Initialize the encoder
@@ -147,14 +145,14 @@ retriever.upload_library(library)
 
 # Search for documents
 results = retriever.search(
-    question="How do I use the API?",
-    collection_name="documentation",
-    top_k=5
+   question="How do I use the API?",
+   collection_name="documentation",
+   top_k=5
 )
 
 # Print the results
 for result in results:
-    print(result.markdown)
+   print(result.markdown)
 ```
 
 ### DocumentationTool
@@ -166,8 +164,8 @@ OpenSearch. It uses the `OpenSearchRetriever` to find relevant documentation and
 
 ```python
 from langchain_core.language_models import ChatOpenAI
-from crawler.documentation_tool import DocumentationTool
-from crawler.opensearch_retriever import OpenSearchRetriever
+from aidkit.documentation_tool import DocumentationTool
+from aidkit.storage.opensearch_retriever import OpenSearchRetriever
 
 # Initialize the language model
 llm = ChatOpenAI(model="gpt-3.5-turbo")
@@ -177,10 +175,10 @@ llm = ChatOpenAI(model="gpt-3.5-turbo")
 
 # Create the documentation tool
 doc_tool = DocumentationTool(
-    llm=llm,
-    retriever=retriever,
-    collection_name="documentation",
-    top_k=5
+   llm=llm,
+   retriever=retriever,
+   collection_name="documentation",
+   top_k=5
 )
 
 # Answer a question
@@ -196,16 +194,16 @@ grouping field. It can be used to organize JSON data by a common field, making i
 #### Example Usage
 
 ```python
-from crawler.json_splitter import JsonSplitter
+from aidkit.json_splitter import JsonSplitter
 
 # Create a JsonSplitter instance
 splitter = JsonSplitter(output_dir="output_directory")
 
 # Split a JSON file
 grouped_data = splitter.split_json_file(
-    input_file="large_file.json",
-    group_by_field="title",
-    encoding="utf-8"
+   input_file="large_file.json",
+   group_by_field="title",
+   encoding="utf-8"
 )
 
 # Print information about the created files
@@ -213,59 +211,20 @@ print(f"Total files created: {len(grouped_data)}")
 
 # You can also split JSON data directly
 data = [
-    {"title": "Document 1", "content": "Content 1"},
-    {"title": "Document 2", "content": "Content 2"},
-    {"title": "Document 1", "content": "More content for Document 1"}
+   {"title": "Document 1", "content": "Content 1"},
+   {"title": "Document 2", "content": "Content 2"},
+   {"title": "Document 1", "content": "More content for Document 1"}
 ]
 
 grouped_data = splitter.split_json_data(
-    data=data,
-    group_by_field="title"
+   data=data,
+   group_by_field="title"
 )
 
 # This will create two files:
 # - output_directory/Document_1.json (containing 2 items)
 # - output_directory/Document_2.json (containing 1 item)
 ```
-
----
-
-## Development
-
-If you want to contribute or modify this package, follow these steps:
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/aagumin/twin-crawler.git
-   cd docs-crawler
-   ```
-
-2. Install the package in editable mode with development dependencies:
-
-   ```bash
-   pip install -e .[dev]
-   ```
-
-3. Run the package locally for testing:
-
-   ```bash
-   python -m giga_crawler.main --repo_url ./local_directory --output_path test_output.json
-   ```
-
----
-
-## Dependencies
-
-The project requires the following Python packages:
-
-- **Pydantic**: For modeling and validation of JSON data.
-- **GitPython**: For working with Git repositories.
-- **opensearch-py**: For interacting with OpenSearch.
-- **sentence-transformers**: For encoding text into vectors for semantic search.
-- **langchain-core**: For language model integration and output parsing.
-
-All dependencies are automatically installed when you use `pip install`.
 
 ---
 

@@ -1,7 +1,7 @@
 from opensearchpy import OpenSearch
 from sentence_transformers import SentenceTransformer
-from crawler.storage.opensearch_retriever import OpenSearchRetriever
-from crawler.models import LibrarySource
+from aidkit.storage.opensearch_retriever import OpenSearchRetriever
+from aidkit.models import LibrarySource
 
 # Initialize the OpenSearch client
 client = OpenSearch(

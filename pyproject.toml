@@ -1,7 +1,7 @@
 [project]
-name = "giga_crawler"
-version = "0.1.0"
-description = "A tool for parsing Git repositories and markdown files."
+name = "aidkit"
+version = "0.2.0"
+description = "A tool buildg AI docs assistans. Parsing Git repositories and markdown files. Work with vector db"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [

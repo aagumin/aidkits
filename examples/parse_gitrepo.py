@@ -1,7 +1,7 @@
 import shutil
 
-from crawler import MarkdownCrawler
-from crawler.sources import MdLocation
+from aidkit import MarkdownCrawler
+from aidkit.sources import MdLocation
 
 REPO_WITH_MD="/test"
 

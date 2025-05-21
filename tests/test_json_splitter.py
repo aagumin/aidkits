@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from crawler.json_splitter import JsonSplitter
+from aidkit.json_splitter import JsonSplitter
 
 
 class TestJsonSplitter(unittest.TestCase):

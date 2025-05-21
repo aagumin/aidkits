@@ -3,7 +3,7 @@ import tempfile
 
 import pytest
 
-from crawler.parse import MarkdownCrawler
+from aidkit.parse import MarkdownCrawler
 
 
 @pytest.mark.parametrize(
