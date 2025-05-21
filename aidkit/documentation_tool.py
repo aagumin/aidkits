@@ -3,7 +3,7 @@ from typing import Dict, Optional, List
 from langchain_core.language_models import BaseChatModel
 from langchain_core.output_parsers import BaseOutputParser, StrOutputParser
 
-from crawler.storage.opensearch_retriever import OpenSearchRetriever
+from aidkit.storage.opensearch_retriever import OpenSearchRetriever
 
 # Default documentation prompt
 DOCUMENTATION_PROMPT = """You are an assistant that helps users with documentation questions.
