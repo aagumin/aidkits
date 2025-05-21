@@ -6,7 +6,7 @@ from unittest.mock import patch
 import pytest
 from git import GitCommandError
 
-from aidkit.storage import LocalFileSystem, RemoteGitRepository
+from aidkits.storage import LocalFileSystem, RemoteGitRepository
 
 
 def test_remote_git_repository_fetch_with_valid_uri():

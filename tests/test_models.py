@@ -3,7 +3,7 @@ import tempfile
 
 import pytest
 
-from aidkit.models import CodeChunk, LibrarySource
+from aidkits.models import CodeChunk, LibrarySource
 
 
 def test_code_chunk_initialization():

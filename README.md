@@ -53,7 +53,7 @@ aidkit parse --uri https://github.com/example/repo.git
 or
 
 ```python
-from aidkit import MarkdownCrawler
+from aidkits import MarkdownCrawler
 
 MarkdownCrawler("repo/path").work()
 ```
@@ -119,15 +119,15 @@ The `OpenSearchRetriever` class provides advanced vector search capabilities usi
 ```python
 from opensearchpy import OpenSearch
 from sentence_transformers import SentenceTransformer
-from aidkit.storage.opensearch_retriever import OpenSearchRetriever
-from aidkit.models import LibrarySource
+from aidkits.storage.opensearch_retriever import OpenSearchRetriever
+from aidkits.models import LibrarySource
 
 # Initialize the OpenSearch client
 client = OpenSearch(
-   hosts=[{"host": "localhost", "port": 9200}],
-   http_auth=("admin", "admin"),
-   use_ssl=False,
-   verify_certs=False,
+    hosts=[{"host": "localhost", "port": 9200}],
+    http_auth=("admin", "admin"),
+    use_ssl=False,
+    verify_certs=False,
 )
 
 # Initialize the encoder
@@ -145,14 +145,14 @@ retriever.upload_library(library)
 
 # Search for documents
 results = retriever.search(
-   question="How do I use the API?",
-   collection_name="documentation",
-   top_k=5
+    question="How do I use the API?",
+    collection_name="documentation",
+    top_k=5
 )
 
 # Print the results
 for result in results:
-   print(result.markdown)
+    print(result.markdown)
 ```
 
 ### DocumentationTool
@@ -164,8 +164,8 @@ OpenSearch. It uses the `OpenSearchRetriever` to find relevant documentation and
 
 ```python
 from langchain_core.language_models import ChatOpenAI
-from aidkit.documentation_tool import DocumentationTool
-from aidkit.storage.opensearch_retriever import OpenSearchRetriever
+from aidkits.documentation_tool import DocumentationTool
+from aidkits.storage.opensearch_retriever import OpenSearchRetriever
 
 # Initialize the language model
 llm = ChatOpenAI(model="gpt-3.5-turbo")
@@ -175,10 +175,10 @@ llm = ChatOpenAI(model="gpt-3.5-turbo")
 
 # Create the documentation tool
 doc_tool = DocumentationTool(
-   llm=llm,
-   retriever=retriever,
-   collection_name="documentation",
-   top_k=5
+    llm=llm,
+    retriever=retriever,
+    collection_name="documentation",
+    top_k=5
 )
 
 # Answer a question
@@ -194,16 +194,16 @@ grouping field. It can be used to organize JSON data by a common field, making i
 #### Example Usage
 
 ```python
-from aidkit.json_splitter import JsonSplitter
+from aidkits.json_splitter import JsonSplitter
 
 # Create a JsonSplitter instance
 splitter = JsonSplitter(output_dir="output_directory")
 
 # Split a JSON file
 grouped_data = splitter.split_json_file(
-   input_file="large_file.json",
-   group_by_field="title",
-   encoding="utf-8"
+    input_file="large_file.json",
+    group_by_field="title",
+    encoding="utf-8"
 )
 
 # Print information about the created files
@@ -211,14 +211,14 @@ print(f"Total files created: {len(grouped_data)}")
 
 # You can also split JSON data directly
 data = [
-   {"title": "Document 1", "content": "Content 1"},
-   {"title": "Document 2", "content": "Content 2"},
-   {"title": "Document 1", "content": "More content for Document 1"}
+    {"title": "Document 1", "content": "Content 1"},
+    {"title": "Document 2", "content": "Content 2"},
+    {"title": "Document 1", "content": "More content for Document 1"}
 ]
 
 grouped_data = splitter.split_json_data(
-   data=data,
-   group_by_field="title"
+    data=data,
+    group_by_field="title"
 )
 
 # This will create two files:

@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 from typing import List, Optional, Union
 
-from aidkit.models import CodeChunk, LibrarySource
+from aidkits.models import CodeChunk, LibrarySource
 
 
 class MarkdownCrawler:

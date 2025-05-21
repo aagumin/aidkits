@@ -1,9 +1,9 @@
 import argparse
 from pathlib import Path
 
-from aidkit.parse import MarkdownCrawler
-from aidkit.storage import MdLocation
-from aidkit.json_splitter import JsonSplitter
+from aidkits.parse import MarkdownCrawler
+from aidkits.storage import MdLocation
+from aidkits.json_splitter import JsonSplitter
 
 
 def main():

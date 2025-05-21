@@ -1,5 +1,5 @@
 [project]
-name = "aidkit"
+name = "aidkits"
 version = "0.2.0"
 description = "A tool buildg AI docs assistans. Parsing Git repositories and markdown files. Work with vector db"
 readme = "README.md"

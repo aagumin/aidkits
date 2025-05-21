@@ -5,7 +5,7 @@ from opensearchpy import OpenSearch
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer
 
-from aidkit.models import LibrarySource, CodeChunk
+from aidkits.models import LibrarySource, CodeChunk
 
 
 class OpenSearchRetriever:
